@@ -27,7 +27,8 @@ COPY . .
 
 # Устанавливаем зависимости и проект (если есть poetry.lock, он будет использован автоматически)
 # Poetry 2.x: вместо --no-dev используется --without dev
-RUN poetry install --without dev && rm -rf $POETRY_CACHE_DIR
+# Используем --no-root, так как мы не устанавливаем текущий проект как пакет
+RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 # Используем Poetry для запуска команд
-CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8080"]

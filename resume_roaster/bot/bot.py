@@ -9,8 +9,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "resume_roaster.settings")
 django.setup()
 
 from aiogram import Bot, Dispatcher, F
-from aiogram.filters import CommandStart
-from aiogram.types import Message, BufferedInputFile
+from aiogram.filters import Command, CommandStart
+from aiogram.types import (
+    BufferedInputFile,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    Message,
+    WebAppInfo,
+)
 from django.conf import settings
 
 from .models import ResumeProcessing
@@ -37,6 +43,30 @@ async def cmd_start(message: Message) -> None:
         "Либо просто вставь текст резюме сообщением — я тоже прожарю.\n"
     )
     await message.answer(text)
+
+
+@dp.message(Command("tma"))
+async def cmd_tma(message: Message) -> None:
+    # URL приложения: должен быть публичным (например, через ngrok)
+    # В реальности сюда нужно подставить адрес из конфига или env
+    base_url = os.getenv("WEBHOOK_URL", "https://your-ngrok-url.ngrok-free.app").rstrip("/")
+    tma_url = f"{base_url}/tma/"
+    
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="Открыть Mini App 🔥",
+                    web_app=WebAppInfo(url=tma_url)
+                )
+            ]
+        ]
+    )
+    
+    await message.answer(
+        "Нажми на кнопку ниже, чтобы открыть Mini App и проверить передачу данных:",
+        reply_markup=keyboard
+    )
 
 
 @dp.message(F.document)
